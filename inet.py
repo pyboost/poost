@@ -3,11 +3,11 @@
 #
 # CONTRIBUTORS (sorted by surname)
 # LUO, Pengkui <pengkui.luo@gmail.com>
-# 
+#
 #
 # UPDATED ON
-# 2012: 11/17, 
-# 2013: 
+# 2012: 11/17,
+# 2013:
 #
 """
 Utility functions for manipulating Internet data.
@@ -27,7 +27,7 @@ def inet_atoi (ip):
     """
     return unpack('!I', inet_aton(ip))[0]
 
-    
+
 def inet_itoa (ipint):
     """
     Converts a 32-bit integer IPv4 address to its 4-quad string form.
