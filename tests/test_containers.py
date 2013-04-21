@@ -14,7 +14,7 @@ Unit tests for containers.py
 """
 import unittest
 
-from poost.containers import *
+from pyutils.containers import *
 
 
 class Test_SetList (unittest.TestCase):

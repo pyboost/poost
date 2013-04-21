@@ -1,7 +1,7 @@
-poost
+pyutils
 =======
 
-Loosely coupled Python utilities ('poost': Python Boost)
+Loosely coupled Python utilities
 
 
 
