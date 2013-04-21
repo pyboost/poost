@@ -12,14 +12,19 @@
 """
 Utility functions for manipulating Internet data.
 
-
 """
+__all__ = [
+    'inet_atoi',
+    'inet_itoa',
+    'hostname_valid',
+]
 
+import re
 from struct import pack, unpack
 from socket import inet_aton, inet_ntoa
 
-HOSTNAME_ALLOWED_CHARS = re.compile("(?!-)[a-zA-Z\d-]{1,63}(?<!-)$")
 
+HOSTNAME_ALLOWED_CHARS = re.compile("(?!-)[a-zA-Z\d-]{1,63}(?<!-)$")
 
 def inet_atoi (ip):
     """
