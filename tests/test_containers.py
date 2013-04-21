@@ -14,14 +14,14 @@ Unit tests for containers.py
 """
 import unittest
 
-from pyutils.containers import *
+import poost
 
 
 class Test_SetList (unittest.TestCase):
 
     def setUp (self):
         self.sequence = [3, 1, 2, 'abc', tuple()]
-        self.setlist = SetList(self.sequence)
+        self.setlist = poost.SetList(self.sequence)
 
     def test_islist (self):
         self.assertIsInstance(self.setlist, list)
