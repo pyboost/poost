@@ -69,5 +69,60 @@ class Test_TurboList (unittest.TestCase):
         self.assertListEqual(indices, range(3))
 
 
+class Test_Clusters (unittest.TestCase):
+
+    def setUp (self):
+        objects = poost.TurboList ([-9, 'a', (1,2), 222])
+        self.clusters = poost.Clusters (objects)
+
+    def test__init__ (self):
+        clusters = self.clusters
+        self.assertEqual(len(clusters), 0)
+        self.assertEqual(len(clusters.cids), 4)
+
+    def test_merge_1 (self):
+
+        #objects = poost.TurboList ([-9, 'a', (1,2), 222])
+        clusters = self.clusters
+        clusters.merge(-9, (1,2))
+        self.assertListEqual(clusters.cids, [0, None, 0, None])
+        self.assertEqual(len(clusters), 1)
+        self.assertSetEqual(clusters[0], set([-9, (1,2)]))
+        self.assertListEqual(clusters.unclustered_objs, ['a', 222])
+
+        clusters.merge('a', (1,2))
+        self.assertListEqual(clusters.cids, [0, 0, 0, None])
+        self.assertEqual(len(clusters), 1)
+        self.assertSetEqual(clusters[0], set([-9, 'a', (1,2)]))
+        self.assertListEqual(clusters.unclustered_objs, [222])
+
+        clusters.merge('a', 222)
+        self.assertListEqual(clusters.cids, [0, 0, 0, 0])
+        self.assertEqual(len(clusters), 1)
+        self.assertSetEqual(clusters[0], set([-9, 'a', (1,2), 222]))
+        self.assertListEqual(clusters.unclustered_objs, [])
+
+    def test_merge_2 (self):
+
+        #objects = poost.TurboList ([-9, 'a', (1,2), 222])
+        clusters = self.clusters
+        clusters.merge(-9, (1,2))
+        self.assertListEqual(clusters.cids, [0, None, 0, None])
+        self.assertListEqual(clusters.unclustered_objs, ['a', 222])
+
+        clusters.merge('a', 222)
+        self.assertListEqual(clusters.cids, [0, 1, 0, 1])
+        self.assertEqual(len(clusters), 2)
+        self.assertSetEqual(clusters[0], set([-9, (1,2)]))
+        self.assertSetEqual(clusters[1], set(['a', 222]))
+        self.assertListEqual(clusters.unclustered_objs, [])
+
+        clusters.merge('a', (1,2))
+        self.assertListEqual(clusters.cids, [1, 1, 1, 1])
+        self.assertEqual(len(clusters), 1)
+        self.assertSetEqual(clusters[1], set([-9, 'a', (1,2), 222]))
+        self.assertListEqual(clusters.unclustered_objs, [])
+
+
 if __name__ == '__main__':
     unittest.main()

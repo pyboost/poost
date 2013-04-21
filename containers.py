@@ -14,6 +14,8 @@ More fancy or complex container types.
 """
 __all__ = [
     'TurboList',
+    'Clusters',
+    'NamedDict',
 ]
 
 from collections import OrderedDict
@@ -85,6 +87,75 @@ class TurboList (list):
             assert self._isconsistent()
 
 
+class Clusters (dict):
+    """ Container for storing clustering info for a TurboList object.
+
+        Main data structor: subclassed from dict,
+        mapping a cluster id [int] to an (initially empty) set of objects.
+
+        Usage:
+        ------
+        len(self): returns the number of formed clusters, initially 0.
+
+        Other properties:
+        -----------------
+        'objs': [TurboList instance]
+        'cids': [list] of cluster ids, initially all None.
+        'unclustered_objs': [TurboList instance] not-yet-clustered objects.
+
+    """
+
+    def __init__ (self, objects, **kwargs):
+        """ Constructor. Take a TurboList object as input.
+        """
+        assert isinstance(objects, TurboList)
+        dict.__init__(self, {})
+        self.objs = objects
+        self.cids = [None for _ in xrange(len(self.objs))]
+        self.unclustered_objs = TurboList(objects)
+
+    def merge (self, obj1, obj2, *args):
+        """  Merges belonging clusters of objects obj1, obj2, ... into one.
+        """
+        # Turbolist positions
+        i1 = self.objs.index(obj1)
+        i2 = self.objs.index(obj2)
+        # Cluster IDs
+        cid1 = self.cids[i1]
+        cid2 = self.cids[i2]
+
+        # Case 1: neither obj1 nor obj2 has been clustered yet.
+        if (cid1 is None) and (cid2 is None):
+            cid0 = 1 + max([-1]+self.keys())  # in case len(self)==0
+            self[cid0] = set([obj1, obj2])
+            self.cids[i1] = self.cids[i2] = cid0
+            self.unclustered_objs.remove(obj1)
+            self.unclustered_objs.remove(obj2)
+
+        # Case 2: obj1 was clustered into c1, but obj2 has not been clustered yet.
+        elif (cid1 is not None) and (cid2 is None):
+            self[cid1].add(obj2)
+            self.cids[i2] = cid1
+            self.unclustered_objs.remove(obj2)
+
+        # Case 3: s2 was clustered into c2, but s1 has not been clustered yet.
+        elif (cid1 is None) and (cid2 is not None):
+            self[cid2].add(obj1)
+            self.cids[i1] = cid2
+            self.unclustered_objs.remove(obj1)
+
+        # Case 4: both obj1 and obj2 have been clustered -> merge 2 clusters
+        elif cid1 != cid2:
+            cid0 = max(cid1, cid2)
+            set0 = self[cid1].union(self[cid2])
+            del self[cid1]
+            del self[cid2]
+            self[cid0] = set0
+            for obj in set0:
+                i = self.objs.index(obj)
+                self.cids[i] = cid0
+
+
 class NamedDict (OrderedDict):
     """ NamedDict
     """
@@ -113,3 +184,5 @@ class NamedDict (OrderedDict):
             OrderedDict.__delattr__(self, item)
         else:
             self.__delitem__(item)
+
+
