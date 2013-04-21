@@ -16,6 +16,9 @@ __all__ = [
     'SetList',
 ]
 
+from collections import OrderedDict
+
+
 class SetList (list):
     """ A subclass of type list, but support set-like fast lookup and removals.
 
@@ -33,7 +36,8 @@ class SetList (list):
         """
         # Built-in types (e.g. list) are new-style classes, supporting 'super'.
         # http://rhettinger.wordpress.com/2011/05/26/super-considered-super/
-        super(SetList, self).__init__(sequence)
+        #super(SetList, self).__init__(sequence)
+        list.__init__(self, sequence)
         self._set = set(sequence)
         assert len(self._set) == len(self)
 
@@ -66,3 +70,33 @@ class SetList (list):
         # Double-check non-repeating after removal
         if doublecheck:
             assert len(self._set) == len(self)
+
+
+class NamedDict (OrderedDict):
+    """ NamedDict
+    """
+    def __init__(self, attribute=None, **kwargs):
+        indict = kwargs.items()
+        self.attribute = attribute
+        OrderedDict.__init__(self, indict)
+        self.__initialised = True
+
+    def __getattr__(self, item):
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            raise AttributeError(item)
+
+    def __setattr__(self, item, value):
+        if not self.__dict__.has_key('_NamedDict__initialised'):
+            return OrderedDict.__setattr__(self, item, value)
+        elif self.__dict__.has_key(item):
+            OrderedDict.__setattr__(self, item, value)
+        else:
+            self.__setitem__(item, value)
+
+    def __delattr__(self, item):
+        if self.__dict__.has_key(item):
+            OrderedDict.__delattr__(self, item)
+        else:
+            self.__delitem__(item)
