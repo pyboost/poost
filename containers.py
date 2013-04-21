@@ -13,63 +13,76 @@ More fancy or complex container types.
 
 """
 __all__ = [
-    'SetList',
+    'TurboList',
 ]
 
 from collections import OrderedDict
 
 
-class SetList (list):
-    """ A subclass of type list, but support set-like fast lookup and removals.
+class TurboList (list):
+    """ A subclass of type 'list', supporting:
+        1. Efficient membership test 'x in setlist';
+        2. Efficient index lookup 'setlist.index(x)';
+        3. (Arguably) efficient element removal 'setlist.remove(x)'.
 
-        Main usage:
-        1. Testing whether 'x in setlist';
-        2. Iterating over elements;
-        3. Removing an element from setlist.
+        These are achieved by maintaining a '_indices' dict that maps elements
+        back to list indices.
 
-        Note: only sequences with non-repeating elements are accepted.
-
+        Limitation: repeating elements are not allowed.
     """
+
     def __init__ (self, sequence=[], **kwargs):
-        """ Constructs a SetList instance.
+        """ Constructs a TurboList instance.
 
         """
         # Built-in types (e.g. list) are new-style classes, supporting 'super'.
         # http://rhettinger.wordpress.com/2011/05/26/super-considered-super/
         #super(SetList, self).__init__(sequence)
         list.__init__(self, sequence)
-        self._set = set(sequence)
-        assert len(self._set) == len(self)
+        self._rebuild_indices()
+        assert self._isconsistent()
 
     def __contains__ (self, x):
         """ Returns True if x in this setlist
         """
-        return x in self._set
+        return x in self._indices
 
-    def append (self, x, doublecheck=False):
-        """ Appends an element to this setlist.
-            Double check consistency if doublecheck==True.
+    def _isconsistent (self):
+        """ Consistent if no repeating elements.
+        """
+        return len(self) == len(self._indices)
+
+    def _rebuild_indices (self, pos=None):
+        """ Rebuilds self._indices from the pos-th element.
+        """
+        if pos is None:
+            self._indices = dict((x, i) for i, x in enumerate(self))
+        else:
+            for i, x in enumerate(self[pos:]):
+                self._indices[x] = i + pos
+
+    def index (self, x):
+        """ Finds the index of element x in self (overriding 'list.index')
+        """
+        return self._indices[x]
+
+    def append (self, x, check_consistency=True, **kwargs):
+        """ Appends an element to this setlist (overriding 'list.append').
         """
         list.append(self, x)
-        self._set.add(x)
-        if doublecheck:
-            assert len(self._set) == len(self)
+        self._indices[x] = len(self) - 1
+        if check_consistency:
+            assert self._isconsistent()
 
-    def remove (self, x, pos=None, doublecheck=False):
-        """ Removes an element from this setlist.
-            Double check consistency if doublecheck==True.
+    def remove (self, x, check_consistency=True, **kwargs):
+        """ Removes an element from this setlist (overriding 'list.remove')
         """
-        self._set.remove(x)
-        # Find the correct position in the list.
-        if pos is None:
-            pos = self.index(x)
-        # If needed, double-check the provided position is correct.
-        elif doublecheck:
-            assert pos == self.index(x)
+        pos = self._indices[x]
         del self[pos]
-        # Double-check non-repeating after removal
-        if doublecheck:
-            assert len(self._set) == len(self)
+        del self._indices[x]
+        self._rebuild_indices(pos)
+        if check_consistency:
+            assert self._isconsistent()
 
 
 class NamedDict (OrderedDict):

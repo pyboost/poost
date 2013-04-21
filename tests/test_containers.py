@@ -6,7 +6,7 @@
 #
 #
 # UPDATED ON
-# 2013: 04/20,
+# 2013: 04/20, 04/21,
 #
 """
 Unit tests for containers.py
@@ -17,53 +17,56 @@ import unittest
 import poost
 
 
-class Test_SetList (unittest.TestCase):
+class Test_TurboList (unittest.TestCase):
 
     def setUp (self):
-        self.sequence = [3, 1, 2, 'abc', tuple()]
-        self.setlist = poost.SetList(self.sequence)
+        self.sequence = [3, 1, -2, 'abc', tuple()]
+        self.turbolist = poost.TurboList(self.sequence)
 
     def test_islist (self):
-        self.assertIsInstance(self.setlist, list)
+        self.assertIsInstance(self.turbolist, list)
 
     def test__contains__ (self):
-        setlist = self.setlist
-        self.assertTrue(2 in setlist)
-        self.assertTrue('abc' in setlist)
+        turbolist = self.turbolist
+        self.assertTrue(-2 in turbolist)
+        self.assertTrue('abc' in turbolist)
 
     def test__len__ (self):
-        self.assertTrue(len(self.setlist)==5)
+        self.assertTrue(len(self.turbolist)==5)
 
     def test__getitem__ (self):
-        setlist = self.setlist
-        self.assertEqual(setlist[1], 1)
-        self.assertListEqual(setlist[2:4], [2, 'abc'])
-        self.assertListEqual(setlist[:], self.sequence)
-        self.assertListEqual(setlist, self.sequence)
+        turbolist = self.turbolist
+        self.assertEqual(turbolist[1], 1)
+        self.assertListEqual(turbolist[2:4], [-2, 'abc'])
+        self.assertListEqual(turbolist[:], self.sequence)
+        self.assertListEqual(turbolist, self.sequence)
+
+    def test_index (self):
+        turbolist = self.turbolist
+        self.assertEqual(turbolist.index(3), 0)
+        self.assertEqual(turbolist.index('abc'), 3)
+        self.assertEqual(turbolist.index(tuple()), 4)
 
     def test_append (self):
-        setlist = self.setlist
-        setlist.append(None, doublecheck=True)
-        self.assertListEqual(setlist, self.sequence+[None])
-        self.assertListEqual(setlist[:], self.sequence+[None])
+        turbolist = self.turbolist
+        turbolist.append(None)
+        self.assertListEqual(turbolist, self.sequence+[None])
+        self.assertListEqual(turbolist[:], self.sequence+[None])
 
     def test_remove_1 (self):
-        setlist = self.setlist
-        setlist.remove('abc')
-        self.assertListEqual(setlist, [3, 1, 2, tuple()])
-        self.assertSetEqual(setlist._set, set([3, 1, 2, tuple()]))
+        turbolist = self.turbolist
+        turbolist.remove('abc')
+        self.assertListEqual(turbolist, [3, 1, -2, tuple()])
+        indices = sorted(turbolist._indices.values())
+        self.assertListEqual(indices, range(4))
 
     def test_remove_2 (self):
-        setlist = self.setlist
-        setlist.remove('abc', pos=3)
-        self.assertListEqual(setlist, [3, 1, 2, tuple()])
-        self.assertSetEqual(setlist._set, set([3, 1, 2, tuple()]))
-
-    def test_remove_3 (self):
-        setlist = self.setlist
-        setlist.remove('abc', pos=3, doublecheck=True)
-        self.assertListEqual(setlist, [3, 1, 2, tuple()])
-        self.assertSetEqual(setlist._set, set([3, 1, 2, tuple()]))
+        turbolist = self.turbolist
+        turbolist.remove(3)
+        turbolist.remove(tuple())
+        self.assertListEqual(turbolist, [1, -2, 'abc'])
+        indices = sorted(turbolist._indices.values())
+        self.assertListEqual(indices, range(3))
 
 
 if __name__ == '__main__':
