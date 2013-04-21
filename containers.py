@@ -13,12 +13,43 @@ More fancy or complex container types.
 
 """
 __all__ = [
+    'NamedDict',
     'TurboList',
     'Clusters',
-    'NamedDict',
+    'LengthAscendingStrings',
 ]
 
 from collections import OrderedDict
+
+
+class NamedDict (OrderedDict):
+    """ NamedDict
+    """
+    def __init__(self, attribute=None, **kwargs):
+        indict = kwargs.items()
+        self.attribute = attribute
+        OrderedDict.__init__(self, indict)
+        self.__initialised = True
+
+    def __getattr__(self, item):
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            raise AttributeError(item)
+
+    def __setattr__(self, item, value):
+        if not self.__dict__.has_key('_NamedDict__initialised'):
+            return OrderedDict.__setattr__(self, item, value)
+        elif self.__dict__.has_key(item):
+            OrderedDict.__setattr__(self, item, value)
+        else:
+            self.__setitem__(item, value)
+
+    def __delattr__(self, item):
+        if self.__dict__.has_key(item):
+            OrderedDict.__delattr__(self, item)
+        else:
+            self.__delitem__(item)
 
 
 class TurboList (list):
@@ -156,33 +187,34 @@ class Clusters (dict):
                 self.cids[i] = cid0
 
 
-class NamedDict (OrderedDict):
-    """ NamedDict
+class LengthAscendingStrings (TurboList):
+    """ A container for non-repeating length-ascending strings,
+        subclassed from poost.TurboList.
+
+        Properties
+        ----------
+        'lenbounds': [OrderedDict]
+            Mapping length to a [lo,hi) index tuple, where the length of string
+            of the i-th position can be obtained via len(self).
     """
-    def __init__(self, attribute=None, **kwargs):
-        indict = kwargs.items()
-        self.attribute = attribute
-        OrderedDict.__init__(self, indict)
-        self.__initialised = True
 
-    def __getattr__(self, item):
-        try:
-            return self.__getitem__(item)
-        except KeyError:
-            raise AttributeError(item)
+    def __init__ (self, strings):
+        """ Constructor.
+        """
+        assert all(isinstance(s, str) for s in strings)
+        strlist = list(set(strings))  # To ensure no repeating strings
+        strlist.sort(key=len)  # enforce ascending lengths
+        TurboList.__init__(self, strlist)
 
-    def __setattr__(self, item, value):
-        if not self.__dict__.has_key('_NamedDict__initialised'):
-            return OrderedDict.__setattr__(self, item, value)
-        elif self.__dict__.has_key(item):
-            OrderedDict.__setattr__(self, item, value)
-        else:
-            self.__setitem__(item, value)
-
-    def __delattr__(self, item):
-        if self.__dict__.has_key(item):
-            OrderedDict.__delattr__(self, item)
-        else:
-            self.__delitem__(item)
-
+        # Build lenbounds
+        self.lenbounds = OrderedDict()
+        len2lo = OrderedDict()  # mapping length to lower bound
+        for lo, s in enumerate(self):
+            k = len(s)
+            if k not in len2lo:
+                len2lo[k] = lo
+        # Fill the upper bound also
+        for len_lo, hi in zip(len2lo.items(), len2lo.values()[1:]+[len(self)]):
+            length, lo = len_lo
+            self.lenbounds[length] = (lo, hi)
 
