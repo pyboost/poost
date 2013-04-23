@@ -107,6 +107,14 @@ class TurboList (list):
         if check_consistency:
             assert self._isconsistent()
 
+    def insert (self, pos, x, check_consistency=True):
+        """ Insert element x before index pos.
+        """
+        list.insert(self, pos, x)
+        self._rebuild_indices(pos)
+        if check_consistency:
+            assert self._isconsistent()
+
     def remove (self, x, check_consistency=True, **kwargs):
         """ Removes an element from this setlist (overriding 'list.remove')
         """
@@ -130,9 +138,9 @@ class Clusters (dict):
 
         Other properties:
         -----------------
-        'objs': [TurboList instance]
-        'cids': [list] of cluster ids, initially all None.
-        'unclustered_objs': [TurboList instance] not-yet-clustered objects.
+        'raw': [TurboList instance] original input objects.
+        '_cids': [list] of cluster ids, initially all None.
+        'unclustered': [TurboList instance] not-yet-clustered objects.
 
     """
 
@@ -141,39 +149,39 @@ class Clusters (dict):
         """
         assert isinstance(objects, TurboList)
         dict.__init__(self, {})
-        self.objs = objects
-        self.cids = [None for _ in xrange(len(self.objs))]
-        self.unclustered_objs = TurboList(objects)
+        self.raw = objects
+        self.unclustered = TurboList(objects)
+        self._cids = [None for _ in xrange(len(objects))]
 
     def merge (self, obj1, obj2, *args):
         """  Merges belonging clusters of objects obj1, obj2, ... into one.
         """
         # Turbolist positions
-        i1 = self.objs.index(obj1)
-        i2 = self.objs.index(obj2)
+        i1 = self.raw.index(obj1)
+        i2 = self.raw.index(obj2)
         # Cluster IDs
-        cid1 = self.cids[i1]
-        cid2 = self.cids[i2]
+        cid1 = self._cids[i1]
+        cid2 = self._cids[i2]
 
         # Case 1: neither obj1 nor obj2 has been clustered yet.
         if (cid1 is None) and (cid2 is None):
             cid0 = 1 + max([-1]+self.keys())  # in case len(self)==0
             self[cid0] = set([obj1, obj2])
-            self.cids[i1] = self.cids[i2] = cid0
-            self.unclustered_objs.remove(obj1)
-            self.unclustered_objs.remove(obj2)
+            self._cids[i1] = self._cids[i2] = cid0
+            self.unclustered.remove(obj1)
+            self.unclustered.remove(obj2)
 
         # Case 2: obj1 was clustered into c1, but obj2 has not been clustered yet.
         elif (cid1 is not None) and (cid2 is None):
             self[cid1].add(obj2)
-            self.cids[i2] = cid1
-            self.unclustered_objs.remove(obj2)
+            self._cids[i2] = cid1
+            self.unclustered.remove(obj2)
 
         # Case 3: s2 was clustered into c2, but s1 has not been clustered yet.
         elif (cid1 is None) and (cid2 is not None):
             self[cid2].add(obj1)
-            self.cids[i1] = cid2
-            self.unclustered_objs.remove(obj1)
+            self._cids[i1] = cid2
+            self.unclustered.remove(obj1)
 
         # Case 4: both obj1 and obj2 have been clustered -> merge 2 clusters
         elif cid1 != cid2:
@@ -183,8 +191,20 @@ class Clusters (dict):
             del self[cid2]
             self[cid0] = set0
             for obj in set0:
-                i = self.objs.index(obj)
-                self.cids[i] = cid0
+                i = self.raw.index(obj)
+                self._cids[i] = cid0
+
+    def indices_in_same_cluster (self, i1, i2, *args):
+        """ True if objects with indices i1, i2, ... are in the same cluster.
+        """
+        return self._cids[i1] == self._cids[i2] >= 0
+
+    def objects_in_same_cluster (self, obj1, obj2, *args):
+        """ Returns True if objtects obj1, objt2, ... are in the same cluster.
+        """
+        i1 = self.raw.index(obj1)
+        i2 = self.raw.index(obj2)
+        return self.indices_in_same_cluster(i1, i2)
 
 
 class LengthAscendingStrings (TurboList):
