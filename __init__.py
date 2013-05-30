@@ -1,7 +1,6 @@
-# Bring all utilities on the top-level namespace.
-
-#from __future__ import absolute_import
-
+# Classes or utilities that should be brought to the top-level namespace.
 from containers import *
-from inet import *
+
+# Utilities that are supposed to use with another layer of namespace
+import inet
 
