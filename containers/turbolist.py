@@ -8,10 +8,7 @@
 # UPDATED ON
 # 2013: 04/20, 04/21, 5/30
 #
-"""
-More fancy or complex container types.
 
-"""
 __all__ = ['TurboList']
 
 
