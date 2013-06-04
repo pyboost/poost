@@ -17,10 +17,11 @@ from turbolist import TurboList
 
 
 class Clusters (dict):
-    """ Container for storing clustering info for a TurboList object.
+    """ A generic container for storing clustering info for a TurboList object.
 
         Main data structor: subclassed from dict,
-        mapping a cluster id [int] to an (initially empty) set of objects.
+        mapping a cluster id [int] to an (initially empty) set of objects,
+        where the object can be any arbitrary complex object.
 
         Usage:
         ------
@@ -28,7 +29,7 @@ class Clusters (dict):
 
         Other properties:
         -----------------
-        'raw': [TurboList instance] original input objects.
+        'raw': [TurboList instance] original input objects - never changes
         '_cids': [list] of cluster ids, initially all None.
         'unclustered': [TurboList instance] not-yet-clustered objects.
 
@@ -53,7 +54,7 @@ class Clusters (dict):
         # Cluster IDs
         cid1 = self._cids[i1]
         cid2 = self._cids[i2]
-        cid0 = None
+        #cid0 = None
 
         # Case 1: neither obj1 nor obj2 has been clustered yet.
         if (cid1 is None) and (cid2 is None):
@@ -89,7 +90,35 @@ class Clusters (dict):
                 i = self.raw.index(obj)
                 self._cids[i] = cid0
 
+        # Case 5: obj1 and obj2 were in the same cluster -> do nothing
+        else: cid0 = cid1
+
         return cid0
+
+
+    def delete_cluster (self, cid=None, obj=None):
+        """ Delete a cluster either by cid, or through a member obj.
+            obj, if available, will override cid.
+        """
+        if obj is not None:
+            i = self.raw.index(obj)
+            cid = self._cids[i]
+        assert cid is not None
+        cluster = self[cid]
+        for cobj in cluster:
+            self.unclustered.append(cobj)
+            i = self.raw.index(cobj)
+            self._cids[i] = None
+        self.pop(cid)
+
+    def purge_small_clusters (self, smallest_size=3):
+        """ Purge clusters with size less than smallest_size.
+        """
+        # To prevent "dict changed size during iteration",
+        # self.items() returns a copy
+        for cid, cluster in self.items():
+            if len(cluster) < smallest_size:
+                self.delete_cluster(cid=cid)
 
     def indices_in_same_cluster (self, i1, i2, *args):
         """ True if objects with indices i1, i2, ... are in the same cluster.
