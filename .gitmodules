@@ -10,3 +10,6 @@
 [submodule "meta"]
 	path = meta
 	url = git@github.com:pengkui/meta.git
+[submodule "parallel"]
+	path = parallel
+	url = git@github.com:pengkui/parallel.git
