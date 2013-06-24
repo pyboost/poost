@@ -13,3 +13,6 @@
 [submodule "parallel"]
 	path = parallel
 	url = git@github.com:pengkui/parallel.git
+[submodule "cache"]
+	path = cache
+	url = git@github.com:pengkui/cache.git
