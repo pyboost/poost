@@ -7,3 +7,6 @@
 [submodule "containers"]
 	path = containers
 	url = git@github.com:pengkui/containers.git
+[submodule "meta"]
+	path = meta
+	url = git@github.com:pengkui/meta.git
