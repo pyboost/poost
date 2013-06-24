@@ -1,0 +1,9 @@
+[submodule "sequtils"]
+	path = sequtils
+	url = git@github.com:pengkui/sequtils.git
+[submodule "introspect"]
+	path = introspect
+	url = git@github.com:pengkui/introspect.git
+[submodule "containers"]
+	path = containers
+	url = git@github.com:pengkui/containers.git
