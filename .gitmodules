@@ -1,18 +1,18 @@
 [submodule "sequtils"]
 	path = sequtils
-	url = git@github.com:pengkui/sequtils.git
+	url = git@github.com:pengkui/poost-sequtils.git
 [submodule "introspect"]
 	path = introspect
-	url = git@github.com:pengkui/introspect.git
+	url = git@github.com:pengkui/poost-introspect.git
 [submodule "containers"]
 	path = containers
-	url = git@github.com:pengkui/containers.git
+	url = git@github.com:pengkui/poost-containers.git
 [submodule "meta"]
 	path = meta
-	url = git@github.com:pengkui/meta.git
+	url = git@github.com:pengkui/poost-meta.git
 [submodule "parallel"]
 	path = parallel
-	url = git@github.com:pengkui/parallel.git
+	url = git@github.com:pengkui/poost-parallel.git
 [submodule "cache"]
 	path = cache
-	url = git@github.com:pengkui/cache.git
+	url = git@github.com:pengkui/poost-cache.git
