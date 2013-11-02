@@ -1,18 +1,18 @@
 [submodule "sequtils"]
 	path = sequtils
-	url=ssh://git@bitbucket.org/pluo/poost-sequt.git
+	url=git@github.com:pengkui/poost-sequt.git
 [submodule "introspect"]
 	path = introspect
-	url=ssh://git@bitbucket.org/pluo/poost-introspect.git
+	url=git@github.com:pengkui/poost-introspect.git
 [submodule "containers"]
 	path = containers
-	url=ssh://git@bitbucket.org/pluo/poost-containers.git
+	url=git@github.com:pengkui/poost-containers.git
 [submodule "meta"]
 	path = meta
-	url=ssh://git@bitbucket.org/pluo/poost-meta.git
+	url=git@github.com:pengkui/poost-meta.git
 [submodule "parallel"]
 	path = parallel
-	url=ssh://git@bitbucket.org/pluo/poost-parallel.git
+	url=git@github.com:pengkui/poost-parallel.git
 [submodule "cache"]
 	path = cache
-	url=ssh://git@bitbucket.org/pluo/poost-cache.git
+	url=git@github.com:pengkui/poost-cache.git
