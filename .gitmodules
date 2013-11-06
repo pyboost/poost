@@ -1,18 +1,18 @@
-[submodule "sequtils"]
-	path = sequtils
-	url=git@github.com:pengkui/poost-sequt.git
+[submodule "sequt"]
+	path = sequt
+	url=git@github.com:pyboost/poost-sequt.git
 [submodule "introspect"]
 	path = introspect
-	url=git@github.com:pengkui/poost-introspect.git
+	url=git@github.com:pyboost/poost-introspect.git
 [submodule "containers"]
 	path = containers
-	url=git@github.com:pengkui/poost-containers.git
+	url=git@github.com:pyboost/poost-containers.git
 [submodule "meta"]
 	path = meta
-	url=git@github.com:pengkui/poost-meta.git
+	url=git@github.com:pyboost/poost-meta.git
 [submodule "parallel"]
 	path = parallel
-	url=git@github.com:pengkui/poost-parallel.git
+	url=git@github.com:pyboost/poost-parallel.git
 [submodule "cache"]
 	path = cache
-	url=git@github.com:pengkui/poost-cache.git
+	url=git@github.com:pyboost/poost-cache.git
